@@ -1,0 +1,41 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title> Blank </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Teste</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div id="container">
+    <!-- <ion-item> -->
+    <!-- <ion-label>Crescent</ion-label> -->
+
+    <!-- </ion-item> -->
+    <strong>Ready to create an app?</strong>
+    <p>
+      Start with Ionic
+      <a
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://ionicframework.com/docs/components"
+        >UI Components</a
+      >
+    </p>
+    
+    <ion-button (click)="incrementar()">Clique (+)</ion-button>
+    <ion-button (click)="decrementar()">Clique (-)</ion-button>
+    <p>Você clicou {{contador}} vezes</p>
+    <ion-spinner name="crescent" color="tertiary" duration="700"></ion-spinner>
+
+    <br />
+
+    <div>
+      <ion-button routerLink="/component">pagina componentes</ion-button>
+    </div>
+  </div>
+</ion-content>
