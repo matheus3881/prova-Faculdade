@@ -19,6 +19,7 @@
       labelPlacement="floating"
       helperText="Digite um email válido"
       errorText="Email inválido"
+      [(ngModel)] = "email"
       ngModel
       email
     ></ion-input>
@@ -31,8 +32,13 @@
       minlength="5"
       helperText="Digite um nome"
       errorText="Nome inválido"
+      [(ngModel)] = "nome"
       ngModel
       name
     ></ion-input>
+
+     <ion-button (click)="salvarUsuario(nome, email)">Salvar</ion-button>
   </div>
+
+ 
 </ion-content>
