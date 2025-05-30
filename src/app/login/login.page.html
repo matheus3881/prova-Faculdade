@@ -64,22 +64,52 @@
         <h2>{{ produto.nome_produto }}</h2>
         <p>R$ {{ produto.valor_produto | number: '1.2-2' }}</p>
       </ion-label>
-      <ion-button
-        color="danger"
-        fill="clear"
-        slot="end"
-        (click)="excluirProduto(produto.id)"
-      >
-        Excluir
-      </ion-button>
-      <ion-button
-        color="sucess"
-        fill="clear"
-        slot="end"
-        (click)="atualizarProduto(produto)"
-      >
-        atualizar
-      </ion-button>
+      <form action="" [formGroup]="formularioEdicao">
+        <div *ngIf="produtoEditando === produto.id" class="form-edicao">
+          <ion-input
+            placeholder="Nome"
+            formControlName="nome_produto"
+          ></ion-input>
+          <ion-input
+            placeholder="Valor"
+            formControlName="valor_produto"
+          ></ion-input>
+        </div>
+
+        <ng-container *ngIf="produtoEditando !== produto.id">
+          <ion-button
+            fill="clear"
+            color="primary"
+            slot="end"
+            (click)="editarProduto(produto)"
+            >Editar</ion-button
+          >
+          <ion-button
+            fill="clear"
+            color="danger"
+            slot="end"
+            (click)="excluirProduto(produto.id)"
+            >Excluir</ion-button
+          >
+        </ng-container>
+
+        <ng-container *ngIf="produtoEditando === produto.id">
+          <ion-button
+            fill="clear"
+            color="success"
+            slot="end"
+            (click)="salvarEdicao(produto.id)"
+            >Salvar</ion-button
+          >
+          <ion-button
+            fill="clear"
+            color="medium"
+            slot="end"
+            (click)="cancelarEdicao()"
+            >Cancelar</ion-button
+          >
+        </ng-container>
+      </form>
     </ion-item>
   </ion-list>
 </ion-content>

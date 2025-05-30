@@ -11,8 +11,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { CurrencyPipe } from '@angular/common';
 import { deleteDoc, updateDoc, doc } from '@angular/fire/firestore';
 
-
-
 import { FormGroup, FormControl } from '@angular/forms';
 import {
   IonContent,
@@ -121,12 +119,29 @@ export class LoginPage implements OnInit {
     }
   }
 
-  async atualizarProduto(id: string, dados: any) {
-    try {
-      const produtoRef = doc(this.firestore, `produtos/${id}`);
-    await updateDoc(produtoRef, dados);
-    } catch (error) {
-    console.error('Erro ao atualizar produto:', error);
+  produtoEditando: string | null = null;
+  formularioEdicao = new FormGroup({
+    nome_produto: new FormControl('', Validators.required),
+    valor_produto: new FormControl('', Validators.required),
+  });
+
+  editarProduto(produto: any) {
+    this.produtoEditando = produto.id;
+    this.formularioEdicao.setValue({
+      nome_produto: produto.nome_produto,
+      valor_produto: produto.valor_produto,
+    });
+  }
+
+  async salvarEdicao(produtoId: string) {
+    if (this.formularioEdicao.valid) {
+      const ref = doc(this.firestore, 'produtos', produtoId);
+      await updateDoc(ref, this.formularioEdicao.value);
+      this.produtoEditando = null;
     }
+  }
+
+  cancelarEdicao() {
+    this.produtoEditando = null;
   }
 }
