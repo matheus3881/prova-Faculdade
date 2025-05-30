@@ -1,15 +1,32 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Firestore, collection, addDoc } from '@angular/fire/firestore';
+import { FormsModule, Validators } from '@angular/forms';
+import {
+  Firestore,
+  collection,
+  addDoc,
+  collectionData,
+} from '@angular/fire/firestore';
+import { ReactiveFormsModule } from '@angular/forms';
+import { CurrencyPipe } from '@angular/common';
+import { deleteDoc, updateDoc, doc } from '@angular/fire/firestore';
+
+
+
+import { FormGroup, FormControl } from '@angular/forms';
 import {
   IonContent,
   IonHeader,
   IonTitle,
   IonToolbar,
   IonInput,
-  IonButton
+  IonButton,
+  IonText,
+  IonList,
+  IonItem,
+  IonLabel,
 } from '@ionic/angular/standalone';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -24,29 +41,92 @@ import {
     CommonModule,
     FormsModule,
     IonInput,
-    IonButton
+    IonButton,
+    ReactiveFormsModule,
+    IonText,
+    IonList,
+    IonItem,
+    IonLabel,
   ],
+  providers: [CurrencyPipe],
 })
 export class LoginPage implements OnInit {
-  constructor(private firestore: Firestore) {}
+  constructor(
+    private firestore: Firestore,
+    private currencyPipe: CurrencyPipe
+  ) {}
 
-  ngOnInit() {}
+  produtos$!: Observable<any[]>;
 
-  nome: string = '';
-  email: string = '';
+  ngOnInit() {
+    const produtosLista = collection(this.firestore, 'produtos');
+    this.produtos$ = collectionData(produtosLista, { idField: 'id' });
+  }
 
-  async salvarUsuario(nome: string, email: string) {
-    const usuarioRef = collection(this.firestore, 'usuario');
+  teste = new FormGroup({
+    nome_produto: new FormControl('', Validators.required),
+    valor_produto: new FormControl('', [
+      Validators.required,
+      Validators.min(0),
+    ]),
+  });
 
+  async salvarUsuario(teste: FormGroup) {
+    if (this.teste.valid) {
+      const usuarioRef = collection(this.firestore, 'produtos');
+
+      try {
+        await addDoc(usuarioRef, {
+          nome_produto: teste.value.nome_produto,
+          valor_produto: teste.value.valor_produto,
+          criadoEm: new Date(),
+        });
+        this.teste.reset();
+      } catch (error) {
+        console.error('deu ruim', error);
+      }
+    } else {
+      this.teste.markAllAsTouched();
+      console.warn('formulário inválido');
+    }
+  }
+
+  formatarMoeda() {
+    const control = this.teste.get('valor_produto');
+    const valor = control?.value;
+
+    if (valor) {
+      const numero = parseFloat(
+        valor.replace(/[^\d,-]/g, '').replace('.', ',')
+      );
+
+      const formatado = this.currencyPipe.transform(
+        numero,
+        'BRL',
+        'symbol-narrow',
+        '1.2-2',
+        'pt-BR'
+      );
+
+      control?.setValue(formatado, { emitEvent: false });
+    }
+  }
+
+  async excluirProduto(id: string) {
     try {
-      await addDoc(usuarioRef, {
-        nome: nome,
-        email: email,
-        criadoEm: new Date(),
-      });
-      console.log('usuário criado com sucesso');
+      const produtoRef = doc(this.firestore, `produtos/${id}`);
+      await deleteDoc(produtoRef);
     } catch (error) {
-      console.error('Erro ao salvar o usuário', error);
+      console.error(error);
+    }
+  }
+
+  async atualizarProduto(id: string, dados: any) {
+    try {
+      const produtoRef = doc(this.firestore, `produtos/${id}`);
+    await updateDoc(produtoRef, dados);
+    } catch (error) {
+    console.error('Erro ao atualizar produto:', error);
     }
   }
 }

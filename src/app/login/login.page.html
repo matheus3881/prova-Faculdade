@@ -1,44 +1,85 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>login</ion-title>
+  <ion-toolbar color="primary">
+    <ion-title class="ion-text-center">Cadastro de Produto</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">login</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="ion-padding">
+  <form [formGroup]="teste" class="form-cadastro">
+    <div>
+      <ion-input
+        label="produto"
+        label-placement="floating"
+        fill="outline"
+        placeholder="Enter text"
+        formControlName="nome_produto"
+        placeholder="Digite o nome do produto"
+      ></ion-input>
 
-  <div>
-    <ion-input
-      type="email"
-      fill="solid"
-      label="email"
-      labelPlacement="floating"
-      helperText="Digite um email válido"
-      errorText="Email inválido"
-      [(ngModel)] = "email"
-      ngModel
-      email
-    ></ion-input>
+      <ion-text
+        color="danger"
+        *ngIf="teste.get('nome_produto')?.invalid && teste.get('nome_produto')?.touched"
+        class="ion-padding-start"
+      >
+        Produto é obrigatório
+      </ion-text>
+    </div>
+    <br />
+    <div>
+      <ion-input
+        label="valor"
+        label-placement="floating"
+        fill="outline"
+        type="number"
+        formControlName="valor_produto"
+        placeholder="Digite o valor"
+        (blur)="formatarMoeda()"
+      ></ion-input>
 
-    <ion-input
-      type="text"
-      fill="solid"
-      label="name"
-      labelPlacement="floating"
-      minlength="5"
-      helperText="Digite um nome"
-      errorText="Nome inválido"
-      [(ngModel)] = "nome"
-      ngModel
-      name
-    ></ion-input>
+      <ion-text
+        color="danger"
+        *ngIf="teste.get('valor_produto')?.invalid && teste.get('valor_produto')?.touched"
+        class="ion-padding-start"
+      >
+        Valor é obrigatório
+      </ion-text>
+    </div>
+    <ion-button
+      expand="block"
+      color="primary"
+      class="ion-margin-top"
+      (click)="salvarUsuario(teste)"
+    >
+      Salvar
+    </ion-button>
+  </form>
 
-     <ion-button (click)="salvarUsuario(nome, email)">Salvar</ion-button>
-  </div>
-
- 
+  <ion-list class="ion-margin-top">
+    <ion-item
+      *ngFor="let produto of produtos$ | async"
+      lines="full"
+      class="produto-item"
+    >
+      <ion-label>
+        <h2>{{ produto.nome_produto }}</h2>
+        <p>R$ {{ produto.valor_produto | number: '1.2-2' }}</p>
+      </ion-label>
+      <ion-button
+        color="danger"
+        fill="clear"
+        slot="end"
+        (click)="excluirProduto(produto.id)"
+      >
+        Excluir
+      </ion-button>
+      <ion-button
+        color="sucess"
+        fill="clear"
+        slot="end"
+        (click)="atualizarProduto(produto)"
+      >
+        atualizar
+      </ion-button>
+    </ion-item>
+  </ion-list>
 </ion-content>
